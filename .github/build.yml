@@ -16,14 +16,10 @@ jobs:
           distribution: 'temurin'
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ hashFiles('**/*.gradle*') }}
       - name: Generate Gradle Wrapper
-        run: gradle wrapper --gradle-version 8.1
+        run: gradle wrapper --gradle-version 8.2 --distribution-type bin
+      - name: Verify Gradle Version
+        run: ./gradlew --version
       - name: Build Debug APK
         run: ./gradlew assembleDebug --no-daemon --stacktrace
       - name: Upload APK
