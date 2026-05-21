@@ -1,8 +1,11 @@
+
 name: Build APK
+
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,20 +15,20 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Download Gradle Wrapper JAR
-        run: |
-          mkdir -p gradle/wrapper
-          curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.2.0/gradle/wrapper/gradle-wrapper.jar
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
       - uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: gradle-${{ hashFiles('**/*.gradle*') }}
-      - run: chmod +x gradlew
-      - run: ./gradlew assembleDebug --no-daemon
-      - uses: actions/upload-artifact@v4
+      - name: Generate Gradle Wrapper
+        run: gradle wrapper --gradle-version 8.1
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
-          name: UdpMessenger-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 30
+          name: app-debug
+          path: app/build/outputs/apk/debug/*.apk
